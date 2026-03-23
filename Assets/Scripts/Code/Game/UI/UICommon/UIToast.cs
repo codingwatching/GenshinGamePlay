@@ -9,6 +9,14 @@ namespace TaoTie
 
         public UIMonoBehaviour<CanvasGroup> CanvasGroup;
         public UITextmesh Text;
+        public static async ETTask ShowToast(string content)
+        {
+            await UIManager.Instance.OpenBox<UIToast,string>(PrefabPath, content);
+        }
+        public static void ShowToast(I18NKey key)
+        {
+            UIManager.Instance.OpenBox<UIToast,I18NKey>(PrefabPath, key).Coroutine();
+        }
         public void OnCreate()
         {
             GameObjectPoolManager.GetInstance().AddPersistentPrefabPath(PrefabPath);
