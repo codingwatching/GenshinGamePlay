@@ -833,9 +833,10 @@ namespace TaoTie
             var target = GetWindow(uiName);
             if (target != null)
             {
+                var name = target.Name;
                 await CloseWindow(uiName);
                 InnerDestroyWindow(target, clear);
-                windows.Remove(target.Name);
+                windows.Remove(name);
                 target.Dispose();
             }
         }
