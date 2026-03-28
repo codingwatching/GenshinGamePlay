@@ -773,11 +773,13 @@ namespace TaoTie
             {
                 await TimerManager.Instance.WaitAsync(1);
             }
-            
-            InnerCloseWindow(target);
-            InnerDestroyWindow(target, clear);
-            boxes.Remove(view);
-            target.Dispose();
+            if (boxes.ContainsKey(view))
+            {
+                boxes.Remove(view);
+                InnerCloseWindow(target);
+                InnerDestroyWindow(target, clear);
+                target.Dispose();
+            }
             return true;
         }
 
@@ -833,10 +835,18 @@ namespace TaoTie
             var target = GetWindow(uiName);
             if (target != null)
             {
-                windows.Remove(target.Name);
-                await CloseWindow(uiName);
-                InnerDestroyWindow(target, clear);
-                target.Dispose();
+                while (target.LoadingState != UIWindowLoadingState.LoadOver)
+                {
+                    await TimerManager.Instance.WaitAsync(1);
+                }
+                if (windows.ContainsKey(target.Name))
+                {
+                    windows.Remove(target.Name);
+                    RemoveFromStack(target);
+                    InnerCloseWindow(target);
+                    InnerDestroyWindow(target, clear);
+                    target.Dispose();
+                }
             }
         }
 
