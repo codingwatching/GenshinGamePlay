@@ -7,7 +7,7 @@ namespace TaoTie
 {
     public static class Log
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         static Log()
         {
             if (!UnityEngine.Application.isPlaying)
@@ -16,7 +16,7 @@ namespace TaoTie
             }
         }
         
-        #endif
+#endif
         public static ILog ILog { get; set; }
         
         private const int TraceLevel = 1;
@@ -28,7 +28,7 @@ namespace TaoTie
         {
             return Define.LogLevel <= level;
         }
-        
+        [Conditional("UNITY_EDITOR")]
         public static void Trace(string msg)
         {
             if (!CheckLogLevel(DebugLevel))
@@ -38,7 +38,7 @@ namespace TaoTie
             StackTrace st = new StackTrace(1, true);
             ILog.Trace($"{msg}\n{st}");
         }
-
+        [Conditional("UNITY_EDITOR")]
         public static void Debug(string msg)
         {
             if (!CheckLogLevel(DebugLevel))
@@ -47,7 +47,7 @@ namespace TaoTie
             }
             ILog.Debug(msg);
         }
-
+        [Conditional("UNITY_EDITOR")]
         public static void Info(string msg)
         {
             if (!CheckLogLevel(InfoLevel))
@@ -56,6 +56,7 @@ namespace TaoTie
             }
             ILog.Info(msg);
         }
+        [Conditional("UNITY_EDITOR")]
         public static void Info(object msg)
         {
             if (!CheckLogLevel(InfoLevel))
@@ -64,6 +65,7 @@ namespace TaoTie
             }
             ILog.Info(msg.ToString());
         }
+        [Conditional("UNITY_EDITOR")]
         public static void TraceInfo(string msg)
         {
             if (!CheckLogLevel(InfoLevel))
@@ -100,7 +102,7 @@ namespace TaoTie
             string str = e.ToString();
             ILog.Error(str);
         }
-
+        [Conditional("UNITY_EDITOR")]
         public static void Trace(string message, params object[] args)
         {
             if (!CheckLogLevel(TraceLevel))
@@ -119,7 +121,7 @@ namespace TaoTie
             }
             ILog.Warning(string.Format(message, args));
         }
-
+        [Conditional("UNITY_EDITOR")]
         public static void Info(string message, params object[] args)
         {
             if (!CheckLogLevel(InfoLevel))
@@ -128,7 +130,7 @@ namespace TaoTie
             }
             ILog.Info(string.Format(message, args));
         }
-
+        [Conditional("UNITY_EDITOR")]
         public static void Debug(string message, params object[] args)
         {
             if (!CheckLogLevel(DebugLevel))
