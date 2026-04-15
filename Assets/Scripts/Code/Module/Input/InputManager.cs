@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Nino.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TaoTie
 {
@@ -46,10 +47,11 @@ namespace TaoTie
         private readonly int[] keyStatus = new int[GameKeyCode.Max];
         
         private Vector2 mousePosition;
-        private Touch oldTouch1;
-        private Touch oldTouch2;
+        private TouchInfo oldTouch1;
+        private TouchInfo oldTouch2;
 
         private readonly List<TouchInfo> touchInfos = new List<TouchInfo>();
+        private readonly Dictionary<int, TouchInfo> touchMap = new Dictionary<int, TouchInfo>();
         #region IManager
 
         public void Init()
@@ -97,6 +99,7 @@ namespace TaoTie
         {
             Instance = null;
             touchInfos.Clear();
+            touchMap.Clear();
             Array.Clear(keySetMap,0,GameKeyCode.Max);
             Array.Clear(keyStatus,0,GameKeyCode.Max);
         }
@@ -105,7 +108,7 @@ namespace TaoTie
 
         public void Update()
         {
-            AddTouch();
+            UpdateTouches();
             Array.Clear(keyStatus, 0, GameKeyCode.Max);
             MouseScrollWheel = 0;
             MouseAxisX = 0;
@@ -175,70 +178,58 @@ namespace TaoTie
 
                 UpdateMouse();
             }
-
-            RemoveTouch();
         }
 
-        private void AddTouch()
+        /// <summary>
+        /// 每帧更新触摸信息，维护 touchInfos 和 touchMap
+        /// </summary>
+        private void UpdateTouches()
         {
+            // 清空当前帧的触摸列表（准备重新填充）
+            touchInfos.Clear();
+
             for (int i = 0; i < Input.touchCount; i++)
             {
-                try
+                Touch touch = Input.GetTouch(i);
+                int fingerId = touch.fingerId;
+
+                // 尝试从字典获取已有的 TouchInfo
+                if (!touchMap.TryGetValue(fingerId, out TouchInfo info))
                 {
-                    var touch = Input.GetTouch(i);
-                    if (touch.phase == TouchPhase.Began)
+                    // 新触摸：从对象池获取
+                    info = ObjectPool.Instance.Fetch<TouchInfo>();
+                    info.IsStartOverUI = IsPointerOverUI(touch.position);
+                    info.IsScroll = PlatformUtil.IsSimulator(); // 模拟器初始假设为滚轮
+                    touchMap.Add(fingerId, info);
+                }
+
+                // 更新 TouchInfo 的当前触摸数据（阶段、位置、增量等）
+                info.Phase = touch.phase;
+                info.Position = touch.position;
+                info.DeltaPosition = touch.deltaPosition;
+
+                // 更新 IsScroll 标志（模拟器下特殊处理）
+                if (PlatformUtil.IsSimulator() && touch.phase == TouchPhase.Moved)
+                {
+                    // 水平方向有移动或竖直移动量很小 -> 不是滚轮
+                    if (Mathf.Abs(touch.deltaPosition.x) > 0.01f || Mathf.Abs(touch.deltaPosition.y) < 5f)
                     {
-                        var info = ObjectPool.Instance.Fetch<TouchInfo>();
-                        info.Index = i;
-                        info.IsScroll = PlatformUtil.IsSimulator();
-                        info.IsStartOverUI = IsPointerOverUI(touch.position);
-                        touchInfos.Add(info);
-                    }
-                    else if (touch.phase == TouchPhase.Moved)
-                    {
-                        if (PlatformUtil.IsSimulator() &&
-                            touchInfos[i].IsScroll) //模拟器下, 同一次触碰水平方向移动分量为0, 竖直快速移动的可粗略判定为滚轮
-                        {
-                            if (Mathf.Abs(touch.deltaPosition.y) < 5 || touch.deltaPosition.x != 0)
-                            {
-                                touchInfos[i].IsScroll = false;
-                            }
-                        }
+                        info.IsScroll = false;
                     }
                 }
-                catch (Exception ex)
+
+                // 将当前触摸加入列表（供外部使用）
+                touchInfos.Add(info);
+
+                // 若触摸结束，从字典移除并回收对象
+                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
                 {
-                    Log.Error(ex);
+                    touchMap.Remove(fingerId);
+                    info.Dispose(); // 归还对象池
                 }
             }
         }
-
-        private void RemoveTouch()
-        {
-            for (int i = Input.touchCount - 1; i >=0 ; i--)
-            {
-                try
-                {
-                    if (Input.GetTouch(i).phase == TouchPhase.Ended)
-                    {
-                        touchInfos[i].Dispose();
-                        touchInfos.RemoveAt(i);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    touchInfos[i].Dispose();
-                    touchInfos.RemoveAt(i);
-                    Log.Error(ex);
-                }
-            }
-
-            for (int i = 0; i < touchInfos.Count; i++)
-            {
-                touchInfos[i].Index = i;
-            }
-        }
-
+        
         /// <summary>
         /// 获取和UI无关的触碰
         /// </summary>
@@ -264,24 +255,23 @@ namespace TaoTie
                 using var touchInfos = GetNoneUITouch();
                 if (touchInfos.Count == 1)
                 {
-                    var t = touchInfos[0].Touch;
-                    if(t == null) return;
-                    var touch = (Touch) t;
-                    if (touch.phase == TouchPhase.Moved)
+                    var touch = touchInfos[0];
+                    if(touch == null) return;
+                    if (touch.Phase == TouchPhase.Moved)
                     {
                         if (touchInfos[0].IsScroll)
                         {
-                            MouseScrollWheel = touch.deltaPosition.y / 100;
+                            MouseScrollWheel = touch.DeltaPosition.y / 100;
                         }
                         else
                         {
                             //webgl移动端是反的
 #if UNITY_WEBGL
-                            MouseAxisX = -touch.deltaPosition.x / 50;
-                            MouseAxisY = -touch.deltaPosition.y / 50;
+                            MouseAxisX = -touch.DeltaPosition.x / 50;
+                            MouseAxisY = -touch.DeltaPosition.y / 50;
 #else
-                            MouseAxisX = touch.deltaPosition.x / 50;
-                            MouseAxisY = touch.deltaPosition.y / 50;    
+                            MouseAxisX = touch.DeltaPosition.x / 50;
+                            MouseAxisY = touch.DeltaPosition.y / 50;    
 #endif
                         }
                     }
@@ -289,21 +279,17 @@ namespace TaoTie
                 }
                 else if (touchInfos.Count == 2)
                 {
-                    var t = touchInfos[0].Touch;
-                    if(t == null) return;
-                    var newTouch1 = (Touch) t;
-                    t = touchInfos[1].Touch;
-                    if(t == null) return;
-                    var newTouch2 = (Touch) t;
-                    if (newTouch2.phase == TouchPhase.Began)
+                    var newTouch1 = touchInfos[0];
+                    var newTouch2 = touchInfos[1];
+                    if (newTouch2.Phase == TouchPhase.Began)
                     {
                         oldTouch2 = newTouch2;
                         oldTouch1 = newTouch1;
                         return;
                     }
 
-                    float oldDistance = Vector2.Distance(oldTouch1.position, oldTouch2.position);
-                    float newDistance = Vector2.Distance(newTouch1.position, newTouch2.position);
+                    float oldDistance = Vector2.Distance(oldTouch1.Position, oldTouch2.Position);
+                    float newDistance = Vector2.Distance(newTouch1.Position, newTouch2.Position);
                     float offset = newDistance - oldDistance;
 
                     if (Mathf.Abs(offset) >= 3)
@@ -638,6 +624,21 @@ namespace TaoTie
             return false;
         }
         
+        public bool IsPointerOverButton(Vector2 mousePosition)
+        {       
+            //创建一个点击事件
+            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            eventData.position = mousePosition;
+            List<RaycastResult> raycastResults = new List<RaycastResult>();
+            //向点击位置发射一条射线，检测是否点击UI
+            EventSystem.current.RaycastAll(eventData, raycastResults);
+            if (raycastResults.Count > 0)
+            {
+                return raycastResults[0].gameObject.GetComponent<Button>() != null
+                       || raycastResults[0].gameObject.GetComponent<PointerClick>() != null;
+            }
+            return false;
+        }
         #region Gyroscope
 
         /// <summary>
