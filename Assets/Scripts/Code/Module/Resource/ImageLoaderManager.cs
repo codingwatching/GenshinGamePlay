@@ -523,6 +523,12 @@ namespace TaoTie
                 var texture = await HttpManager.Instance.HttpGetImageOnline(url, true);
                 if (texture != null) //本地已经存在
                 {
+                    if (cacheOnlineImage.TryGetValue(url, out data))
+                    {
+                        GameObject.Destroy(texture);
+                        data.RefCount++;
+                        return data.Texture;
+                    }
                     this.cacheOnlineImage.Add(url, new SpriteValue{Texture = texture,RefCount = 1});
                     return texture;
                 }
@@ -543,6 +549,12 @@ namespace TaoTie
                             File.WriteAllBytes(HttpManager.Instance.LocalFile(url), bytes);
                         });
 #endif
+                        if (cacheOnlineImage.TryGetValue(url, out data))
+                        {
+                            GameObject.Destroy(texture);
+                            data.RefCount++;
+                            return data.Texture;
+                        }
                         this.cacheOnlineImage.Add(url, new SpriteValue{Texture = texture,RefCount = 1});
                         return texture;
                     }
