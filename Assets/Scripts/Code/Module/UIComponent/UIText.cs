@@ -35,7 +35,7 @@ namespace TaoTie
             if (this.textKey != default)
             {
                 if (I18NManager.Instance.I18NTryGetText(this.textKey, out var text) && this.keyParams != null)
-                    text = string.Format(text, this.keyParams);
+                    text = StringHelper.SafeFormat(text, this.keyParams);
                 this.text.text = text;
             }
         }
@@ -101,7 +101,7 @@ namespace TaoTie
                 this.DisableI18Component();
                 this.keyParams = paras;
                 if (I18NManager.Instance.I18NTryGetText(this.textKey, out var text) && paras != null)
-                    text = string.Format(text, paras);
+                    text = StringHelper.SafeFormat(text, paras);
                 this.text.text = text;
             }
         }
