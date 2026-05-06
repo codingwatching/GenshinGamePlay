@@ -167,7 +167,13 @@ namespace TaoTie
             {
                 node.Value.Update();
             }
-            int count = UnityLifeTimeHelper.UpdateFinishTask.Count;
+            int count = UnityLifeTimeHelper.NextUpdateFinishTask.Count;
+            while (count-- > 0)
+            {
+                ETTask task = UnityLifeTimeHelper.NextUpdateFinishTask.Dequeue();
+                task.SetResult();
+            }
+            count = UnityLifeTimeHelper.UpdateFinishTask.Count;
             while (count-- > 0)
             {
                 ETTask task = UnityLifeTimeHelper.UpdateFinishTask.Dequeue();

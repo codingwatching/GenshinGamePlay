@@ -83,12 +83,12 @@ namespace TaoTie
             Log.Info("InnerSwitchScene ProcessRunning Done ");
             while (ResourcesManager.Instance.IsProcessRunning() && !ResourcesManager.Instance.IsPreloadScene())
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             slidValue += 0.01f;
             await scene.SetProgress(slidValue);
-            await TimerManager.Instance.WaitAsync(1);
+            await UnityLifeTimeHelper.WaitNextUpdateFinish();
 
             //清理UI
             Log.Info("InnerSwitchScene Clean UI");
@@ -131,7 +131,7 @@ namespace TaoTie
             var res = Resources.UnloadUnusedAssets();
             while (!res.isDone && !ResourcesManager.Instance.IsPreloadScene())
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             slidValue += cleanup;

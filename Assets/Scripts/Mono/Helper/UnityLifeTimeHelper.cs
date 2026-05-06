@@ -4,7 +4,14 @@ namespace TaoTie
 {
     public static class UnityLifeTimeHelper
     {
-
+        public static readonly Queue<ETTask> NextUpdateFinishTask = new Queue<ETTask>();
+        //等待下一帧所有update结束
+        public static ETTask WaitNextUpdateFinish()
+        {
+            ETTask task = ETTask.Create(true);
+            NextUpdateFinishTask.Enqueue(task);
+            return task;
+        }
         public static readonly Queue<ETTask> UpdateFinishTask = new Queue<ETTask>();
         //等待这一帧所有update结束
         public static ETTask WaitUpdateFinish()

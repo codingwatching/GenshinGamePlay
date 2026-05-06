@@ -173,7 +173,7 @@ namespace TaoTie
             WebGLInput.captureAllKeyboardInput = false;
             while (BridgeHelper.IsOverlayDialogActive())
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
             WebGLInput.captureAllKeyboardInput = true;
 

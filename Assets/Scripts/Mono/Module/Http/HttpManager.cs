@@ -148,7 +148,7 @@ namespace TaoTie
                     op.Abort();
                     break;
                 }
-                await TimerManager.Instance.WaitAsync(1,cancelToken);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
             if (op.result == UnityWebRequest.Result.Success)//本地已经存在
             {
@@ -236,7 +236,7 @@ namespace TaoTie
                     op.Abort();
                     break;
                 }
-                await TimerManager.Instance.WaitAsync(1,cancelToken);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
             if (op.result == UnityWebRequest.Result.Success)//本地已经存在
             {
@@ -265,7 +265,7 @@ namespace TaoTie
                     op.Abort();
                     break;
                 }
-                await TimerManager.Instance.WaitAsync(1,cancelToken);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             if (op.result == UnityWebRequest.Result.Success)
@@ -294,7 +294,7 @@ namespace TaoTie
                     op.Abort();
                     break;
                 }
-                await TimerManager.Instance.WaitAsync(1,cancelToken);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             if (op.result == UnityWebRequest.Result.Success)
@@ -332,7 +332,7 @@ namespace TaoTie
                     op.Abort();
                     break;
                 }
-                await TimerManager.Instance.WaitAsync(1,cancelToken);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             if (op.result == UnityWebRequest.Result.Success)

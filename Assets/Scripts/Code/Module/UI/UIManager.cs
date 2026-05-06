@@ -719,7 +719,7 @@ namespace TaoTie
             if (target == null) return;
             while (target.LoadingState != UIWindowLoadingState.LoadOver)
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             RemoveFromStack(target);
@@ -739,7 +739,7 @@ namespace TaoTie
             }
             while (target.LoadingState != UIWindowLoadingState.LoadOver)
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
 
             await TimerManager.Instance.WaitTillAsync(time);
@@ -771,7 +771,7 @@ namespace TaoTie
             }
             while (target.LoadingState != UIWindowLoadingState.LoadOver)
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitNextUpdateFinish();
             }
             if (boxes.ContainsKey(view))
             {
@@ -837,7 +837,7 @@ namespace TaoTie
             {
                 while (target.LoadingState != UIWindowLoadingState.LoadOver)
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                 }
                 if (windows.ContainsKey(target.Name))
                 {

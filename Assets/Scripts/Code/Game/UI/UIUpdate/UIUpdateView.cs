@@ -94,7 +94,7 @@ namespace TaoTie
         {
             while (ResourcesManager.Instance.IsProcessRunning())
             {
-                await TimerManager.Instance.WaitAsync(1);
+                await UnityLifeTimeHelper.WaitUpdateFinish();
             }
 
             await UIManager.Instance.DestroyAllWindow();

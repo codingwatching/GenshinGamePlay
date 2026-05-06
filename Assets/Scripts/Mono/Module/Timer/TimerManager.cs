@@ -273,12 +273,6 @@ namespace TaoTie
             return ret;
         }
 
-        public async ETTask<bool> WaitFrameAsync(ETCancellationToken cancellationToken = null)
-        {
-            bool ret = await this.WaitAsync(1, cancellationToken);
-            return ret;
-        }
-
         public async ETTask<bool> WaitAsync(long time, ETCancellationToken cancellationToken = null)
         {
             if (time == 0)
@@ -341,7 +335,7 @@ namespace TaoTie
 
         public virtual long GetTimeNow()
         {
-            return TimeInfo.Instance.ServerNow();
+            return TimeInfo.Instance.ClientNow();
         }
 
         /// <summary>

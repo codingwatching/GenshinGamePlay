@@ -307,7 +307,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
 
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
@@ -325,7 +325,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -352,7 +352,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -380,7 +380,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -409,7 +409,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -439,7 +439,7 @@ namespace TaoTie
             {
                 if (evts.TryGetValue(name, out var evt))
                 {
-                    await TimerManager.Instance.WaitAsync(1);
+                    await UnityLifeTimeHelper.WaitNextUpdateFinish();
                     using var list = ToList(evt);
                     for (int i = 0; i < list.Count; i++)
                     {

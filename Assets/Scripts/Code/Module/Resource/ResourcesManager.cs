@@ -420,7 +420,7 @@ namespace TaoTie
             svc.WarmUp();
             ReleaseAsset(svc);
             //等1帧，释放后立即切场景，可能导致部分机型crash
-            await TimerManager.Instance.WaitAsync(1);
+            await UnityLifeTimeHelper.WaitNextUpdateFinish();
         }
     }
 }
