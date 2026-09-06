@@ -86,13 +86,16 @@ namespace TaoTie
             
             if (InputManager.Instance.GetKey(GameKeyCode.SprintBS))
             {
-                //todo: cd
-                
-                if (direction != Vector3.zero)
+                var skillC = GetComponent<SkillComponent>();
+                if (skillC?.IsSprintBSInCD() != true)
                 {
-                    moveComponent.ForceLookTo(direction);
+                    if (direction != Vector3.zero)
+                    {
+                        moveComponent.ForceLookTo(direction);
+                    }
+                    fsm.SetData(FSMConst.SprintBS, true);
+                    skillC?.TriggerSprintBSCD();
                 }
-                fsm.SetData(FSMConst.SprintBS, true);
             }
             else
             {

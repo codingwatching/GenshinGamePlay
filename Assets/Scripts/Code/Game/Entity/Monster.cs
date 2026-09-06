@@ -35,7 +35,7 @@ namespace TaoTie
             AddComponent<CombatComponent,ConfigCombat>(ConfigActor.Combat);
             using ListComponent<ConfigAbility> list = ConfigAbilityCategory.Instance.GetList(ConfigActor.Abilities);
             AddComponent<AbilityComponent,List<ConfigAbility>>(list);
-            AddComponent<SkillComponent,ConfigSkillInfo[]>(ConfigActor.Skill?.Skills);
+            AddComponent<SkillComponent, ConfigSkill>(ConfigActor.Skill);
             AddComponent<ORCAAgentComponent>();
             if (!string.IsNullOrEmpty(monster.Config.AIPath))
             {

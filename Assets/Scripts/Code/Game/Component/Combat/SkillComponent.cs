@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace TaoTie
 {
-    public class SkillComponent:Component,IComponent,IComponent<ConfigSkillInfo[]>
+    public class SkillComponent:Component,IComponent,IComponent<ConfigSkill>
     {
         private NumericComponent numericComponent => parent.GetComponent<NumericComponent>();
         private CombatComponent combatComponent => parent.GetComponent<CombatComponent>();
         private MoveComponent moveComponent => parent.GetComponent<MoveComponent>();
         public Dictionary<int, SkillInfo> SkillInfoMap;
         public Dictionary<int, SkillInfo> SkillInfoMapLocalId;
+        private int sprintBSId;
         public event Action<int> OnDoSkillEvt;
         #region IComponent
 
@@ -18,16 +19,18 @@ namespace TaoTie
         {
             Init(null);
         }
-        public void Init(ConfigSkillInfo[] skills)
+        public void Init(ConfigSkill config)
         {
             SkillInfoMap = new Dictionary<int, SkillInfo>();
             SkillInfoMapLocalId = new Dictionary<int, SkillInfo>();
-            if (skills != null)
+            for (int i = 0; i < config?.Skills?.Length; i++)
             {
-                for (int i = 0; i < skills.Length; i++)
-                {
-                    AddSkillInfo(skills[i]);
-                }
+                AddSkillInfo(config.Skills[i]);
+            }
+            if (config?.SprintBS != null)
+            {
+                sprintBSId = config.SprintBS.ConfigId;
+                AddSkillInfo(config.SprintBS);
             }
             Messager.Instance.AddListener<string>(Id,MessageId.ExecuteAbility,OnExecuteAbilityEvt);
         }
@@ -41,6 +44,7 @@ namespace TaoTie
 
             SkillInfoMap = null;
             SkillInfoMapLocalId = null;
+            sprintBSId = 0;
         }
         
 
@@ -105,6 +109,15 @@ namespace TaoTie
             }
             return true;
         }
+        /// <summary>
+        /// 冲刺是否CD
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSprintBSInCD()
+        {
+            if (sprintBSId == 0) return false;
+            return IsSkillInCD(sprintBSId);
+        }
 
         public SkillInfo AddSkillInfo(ConfigSkillInfo skill)
         {
@@ -122,6 +135,12 @@ namespace TaoTie
             {
                 info.LastSpellTime = GameTimerManager.Instance.GetTimeNow();
             }
+        }
+        
+        public void TriggerSprintBSCD()
+        {
+            if (sprintBSId == 0) return;
+            TriggerSkillCD(sprintBSId);
         }
     }
 }

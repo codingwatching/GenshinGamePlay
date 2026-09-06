@@ -12,5 +12,8 @@ namespace TaoTie
     {
         [ProtoMember(1)] [LabelText("默认技能")]
         public ConfigSkillInfo[] Skills;
+
+        [ProtoMember(2)] [LabelText("冲刺")] 
+        public ConfigSkillInfo SprintBS;
     }
 }
